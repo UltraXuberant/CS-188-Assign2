@@ -1,57 +1,100 @@
 const {
-	getAllCartItems,
-	getCartItemByCartItemId,
-	getCartItemsByCartId
-} = require('../services/cart-item-service')
+    getAllCartItems,
+    getCartItemByCartItemId,
+    addCartItem,
+    modifyCartItem,
+    removeCartItemByCartItemId,
+    getCartItemsByCartId
+} = require('../services/cart-item-service');
+const {getCartByCartId} = require('../services/cart-service');
 
 const getCartItemsRoute = (server) => {
-	server.route({
-		path: '/cart-items',
-		method: 'GET',
-		handler: (request, h) => {
-			return getAllCartItems();
-		}
-	});
+    server.route({
+        handler: () => getAllCartItems(),
+        method: 'GET',
+        path: '/cart-items'
+    });
+};
+
+const addCartItemsRoute = (server) => {
+    server.route({
+        handler: (request, h) => {
+            const item = request.payload;
+
+            addCartItem(item);
+
+            return h.response(item).code(201);
+        },
+        method: 'POST',
+        path: '/cart-items'
+    });
+};
+
+const modifyCartItemRoute = (server) => {
+    server.route({
+        handler: (request) => {
+            modifyCartItem(request.payload);
+
+            return '';
+        },
+        method: 'PUT',
+        path: '/cart-items/{cartItemId}'
+    });
+};
+
+const deleteCartItemRoute = (server) => {
+    server.route({
+        handler: (request) => {
+            removeCartItemByCartItemId(request.params.cartItemId);
+
+            return '';
+        },
+        method: 'DELETE',
+        path: '/cart-items/{cartItemId}'
+    });
 };
 
 const getCartItemByCartItemIdRoute = (server) => {
-	server.route({
-		path: '/cart-items/{cartItemId}',
-		method: 'GET',
-		handler: (request, h) => {
-			const cartItem = getCartItemByCartItemId(request.params,cartItemId);
+    server.route({
+        handler: (request, h) => {
+            const customer = getCartItemByCartItemId(request.params.cartItemId);
 
-			if (!cartItem) {
-				return h.response().code(404);
-			}
+            if (!customer) {
+                return h.response().code(404);
+            }
 
-			return cartItem;
-		}
-	});
+            return customer;
+        },
+        method: 'GET',
+        path: '/cart-items/{cartItemId}'
+    });
 };
 
 const getCartItemsByCartIdRoute = (server) => {
-	server.route({
-		path: '/carts/{cartId}/cart-items',
-		method: 'GET',
-		handler: (request, h) => {
-			const cartItems = getCartItemsByCartId(request.params.cartId);
+    server.route({
+        handler: (request, h) => {
+            const cart = getCartByCartId(request.params.cartId);
 
-			if (!cartItems) {
-				return h.response().code(404);
-			}
+            if (!cart) {
+                return h.response().code(404);
+            }
 
-			return cartItems;
-		}
-	});
+            return getCartItemsByCartId(request.params.cartId);
+        },
+        method: 'GET',
+        path: '/carts/{cartId}/cart-items'
+    });
 };
 
 const initCartItemControllers = (server) => {
-	getCartItemsRoute(server);
-	getCartItemByCartItemIdRoute(server);
-	getCartItemsByCartIdRoute(server);
+    getCartItemsRoute(server);
+    getCartItemByCartItemIdRoute(server);
+    addCartItemsRoute(server);
+    modifyCartItemRoute(server);
+    deleteCartItemRoute(server);
+    getCartItemsByCartIdRoute(server);
 };
 
 module.exports = {
-	initCartItemControllers
+    initCartItemControllers
 };
