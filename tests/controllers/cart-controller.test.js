@@ -76,24 +76,5 @@ describe('cart controller', () => {
         expect(response.statusCode).toEqual(404);
     });
 
-    it('should return all the carts for a customer', async () => {
-        const response = await fakeServer.inject({
-            method: 'GET',
-            url: `/customers/${expectedCustomerId}/carts`
-        });
 
-        expect(response.statusCode).toEqual(200);
-        expect(response.result).toEqual(expectedCarts);
-    });
-
-    it('should return NOT_FOUND if a customer does not exist when looking for their carts', async () => {
-        const randomCustomerId = uuid.v4();
-
-        const response = await fakeServer.inject({
-            method: 'GET',
-            url: `/customers/${randomCustomerId}/carts`
-        });
-
-        expect(response.statusCode).toEqual(404);
-    });
 });
