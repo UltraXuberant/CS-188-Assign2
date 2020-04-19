@@ -1,35 +1,47 @@
-const uuid = require('uuid');
-
 let cartItems = [
-	{
-		'cart_item_id': uuid.v4(),
-		'cart_id': '03815666-3822-4faf-a580-d3632f7e454b',
-		'item_id': 'dc288183-22f9-4524-8b39-ab8314aec615',
-		'quantity': 2
-	},
-	{
-		'cart_item_id': uuid.v4(),
-		'cart_id': '03815666-3822-4faf-a580-d3632f7e454b',
-		'item_id': '474d4f7f-8398-4a41-9e07-047dc8007662',
-		'quantity': 5
-	}
+    {
+        'cart_id': '44ef41f4-485b-44d6-8635-7418e026be89',
+        'cart_item_id': 'd83ff143-9f8b-445a-8d8f-b9b8fe0f9f30',
+        'item_id': 'd83ff143-9f8b-445a-8d8f-b9b8fe0f9f29',
+        'quantity': 2
+    }
 ];
 
 const selectCartItems = () => ({
-	rows: cartItems,
-	error: new Error(),
-	driver: 'postgres'
+    rows: cartItems
 });
 
 const selectCartItemByCartItemId = (cartItemId) =>
-	cartItems.find((cartItem) => cartItem['cart_item_id'] === cartItemId);
+    cartItems.find((cartItem) => cartItem['cart_item_id'] === cartItemId);
 
 const selectCartItemsByCartId = (cartId) => ({
-	rows: cartItems.filter((cartItem) => cartItem['cart_id'] === cartId)
+    rows: cartItems.filter((cartItem) => cartItem['cart_id'] === cartId)
 });
 
+const insertCartItem = (cartItem) => cartItems.push(cartItem);
+
+const updateCartItem = (updatedItem) => {
+    const itemsThatDontMatch = cartItems.filter((cartItem) =>
+        cartItem['cart_item_id'] !== updatedItem['cart_item_id']
+    );
+
+    cartItems = [
+        ...itemsThatDontMatch,
+        updatedItem
+    ];
+};
+
+const deleteCartItemByCartItemId = (cartItemId) => {
+    cartItems = cartItems.filter((cartItem) =>
+        cartItem['cart_item_id'] !== cartItemId
+    );
+};
+
 module.exports = {
-	selectCartItems,
-	selectCartItemsByCartItemId,
-	selectCartItemsByCartId
+    deleteCartItemByCartItemId,
+    insertCartItem,
+    selectCartItemByCartItemId,
+    selectCartItems,
+    selectCartItemsByCartId,
+    updateCartItem
 };

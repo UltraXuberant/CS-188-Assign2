@@ -1,51 +1,91 @@
 const uuid = require('uuid');
 
 const {
+    deleteCustomerByCustomerId,
+    insertCustomer,
+    selectCustomerByCustomerId,
     selectCustomers,
-    selectCustomerByCustomerId
+    updateCustomer
 } = require('../../repositories/customer-repository');
 
 describe('customer repository', () => {
     let expectedCustomerId,
-        expectedFirstName,
-        expectedLastName,
-        expectedEmail,
         expectedCustomer;
 
     beforeEach(() => {
         expectedCustomerId = 'd83ff143-9f8b-445a-8d8f-b9b8fe0f9f28';
-        expectedFirstName = 'Jason';
-        expectedLastName = 'Bradley';
-        expectedEmail = 'jason.bradley@drake.edu';
 
         expectedCustomer = {
-            'customer_id': expectedCustomerId,
-            'first_name': expectedFirstName,
-            'last_name': expectedLastName,
-            'email': expectedEmail
+            'customer_id': 'd83ff143-9f8b-445a-8d8f-b9b8fe0f9f28',
+            'email': 'jason.bradley@drake.edu',
+            'first_name': 'Jason',
+            'last_name': 'Bradley'
         };
     });
 
     describe('selectCustomers', () => {
         it('should return all the customers', () => {
             const actualCustomers = selectCustomers();
-            const [actualFirstCustomer] = actualCustomers.rows;
 
-            expect(actualFirstCustomer).toEqual(expectedCustomer);
-        });
-    });
-
-    describe('selectCustomerByCustomerId', () => {
-        it('should return a specific customer by customerId', () => {
-            const actualFirstCustomer = selectCustomerByCustomerId(expectedCustomerId);
-
-            expect(actualFirstCustomer).toEqual({
-                'customer_id': expectedCustomerId,
-                'first_name': expectedFirstName,
-                'last_name': expectedLastName,
-                'email': expectedEmail
+            expect(actualCustomers).toEqual({
+                rows: [expectedCustomer]
             });
         });
     });
 
+    describe('selectCustomerByCustomerId', () => {
+        it('should return all the customers', () => {
+            const actualCustomer = selectCustomerByCustomerId(expectedCustomerId);
+
+            expect(actualCustomer).toEqual(expectedCustomer);
+        });
+    });
+
+    describe('deleteCustomerByCustomerId', () => {
+        it('should return all the customers', () => {
+            deleteCustomerByCustomerId(expectedCustomerId);
+
+            const actualCustomers = selectCustomers();
+
+            expect(actualCustomers).toEqual({
+                rows: []
+            });
+        });
+    });
+
+    describe('insertCustomer', () => {
+        it('should insert a new customers', () => {
+            const newCustomer = {
+                'customer_id': uuid.v4(),
+                'email': 'jhalpert@dundermifflin.com',
+                'first_name': 'Jim',
+                'last_name': 'Halpert'
+            };
+
+            insertCustomer(newCustomer);
+
+            const actualCustomers = selectCustomers();
+
+            expect(actualCustomers).toEqual({
+                rows: [newCustomer]
+            });
+        });
+    });
+
+    describe('updateCustomer', () => {
+        it('should insert a new customers', () => {
+            const updatedCustomer = {
+                'customer_id': expectedCustomerId,
+                'email': 'jason.bradley@drake.edu',
+                'first_name': 'JBrad',
+                'last_name': 'ley'
+            };
+
+            updateCustomer(updatedCustomer);
+
+            const actualCustomer = selectCustomerByCustomerId(expectedCustomerId);
+
+            expect(actualCustomer).toEqual(updatedCustomer);
+        });
+    });
 });

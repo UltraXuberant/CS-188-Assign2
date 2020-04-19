@@ -1,35 +1,41 @@
-const uuid = require('uuid');
 let items = [
-	{
-		'item_id': uuid.v4(),
-		'name': 'Ball Cap',
-		'description': "It's a hat",
-		'price': 19.99
-	},
-	{
-		'item_id': uuid.v4(),
-		'name': 'Hoodie',
-		'description': "Drake Merch",
-		'price': 39.99
-	},
-	{
-		'item_id': uuid.v4(),
-		'name': 'Pen',
-		'description': "White pen with blue ink",
-		'price': 2.99
-	},
+    {
+        'description': 'Drake Sweatpants',
+        'item_id': 'd83ff143-9f8b-445a-8d8f-b9b8fe0f9f29',
+        'price': 30
+    }
 ];
 
 const selectItems = () => ({
-	rows: items,
-	error: new Error(),
-	drivers: 'postgres'
+    rows: items
 });
 
-const selectItemsByItemId = (itemId) =>
-	items.find((item) => item['item_id'] === itemId);
+const selectItemByItemId = (itemId) =>
+    items.find((item) => item['item_id'] === itemId);
+
+const insertItem = (item) => items.push(item);
+
+const updateItem = (updatedItem) => {
+    const itemsThatDontMatch = items.filter((item) =>
+        item['item_id'] !== updatedItem['item_id']
+    );
+
+    items = [
+        ...itemsThatDontMatch,
+        updatedItem
+    ];
+};
+
+const deleteItemByItemId = (itemId) => {
+    items = items.filter((item) =>
+        item['item_id'] !== itemId
+    );
+};
 
 module.exports = {
-	selectItems
-	selectItemsByItemId
-}
+    deleteItemByItemId,
+    insertItem,
+    selectItemByItemId,
+    selectItems,
+    updateItem
+};
