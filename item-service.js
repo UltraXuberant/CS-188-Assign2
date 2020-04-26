@@ -1,28 +1,49 @@
 const {
-	selectItems,
-	selectItemByItemId
+    deleteItemByItemId,
+    insertItem,
+    selectItemByItemId,
+    selectItems,
+    updateItem
 } = require('../repositories/item-repository');
 
 const mapToModel = (item) => ({
-	itemId: item['item_id'],
-	name: item['name'],
-	description: item['description'],
-	price: item['price']
+    description: item['description'],
+    image: item['image'],
+    itemId: item['item_id'],
+    price: item['price']
+});
+
+const mapToDTO = (item) => ({
+    'description': item.description,
+    'image': item.image,
+    'item_id': item.itemId,
+    'price': item.price
 });
 
 const getAllItems = () => {
-	const {rows} = selectItems();
+    const {rows} = selectItems();
 
-	return rows.map(mapToModel);
+    return rows.map(mapToModel);
 };
 
 const getItemByItemId = (itemId) => {
-	const item = selectItemByItemId(itemId);
+    const item = selectItemByItemId(itemId);
 
-	return mapToModel(item);
+    if (!item) {
+        return null;
+    }
+
+    return mapToModel(item);
 };
 
+const addItem = (item) => insertItem(mapToDTO(item));
+const modifyItem = (item) => updateItem(mapToDTO(item));
+const removeItemByItemId = (itemId) => deleteItemByItemId(itemId);
+
 module.exports = {
-	getAllItems,
-	getItemByItemId
+    addItem,
+    getAllItems,
+    getItemByItemId,
+    modifyItem,
+    removeItemByItemId
 };
