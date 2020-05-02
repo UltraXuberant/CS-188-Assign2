@@ -1,57 +1,19 @@
-const {
-    deleteCartItemByCartItemId,
-    insertCartItem,
-    selectCartItemByCartItemId,
-    selectCartItems,
-    updateCartItem,
-    selectCartItemsByCartId
-} = require('../repositories/cart-item-repository');
+import fetch from "isomorphic-unfetch";
 
-const mapToModel = (cartItem) => ({
-    cartId: cartItem['cart_id'],
-    cartItemId: cartItem['cart_item_id'],
-    itemId: cartItem['item_id'],
-    quantity: cartItem['quantity']
-});
+export const getCustomersCart = async () => {
+    const customerResponse = await fetch(`http://localhost:5555/customers`);
+    const [customer] = await customerResponse.json();
+    const cartResponse = await fetch(`http://localhost:5555/customers/${customer.customerId}/carts`);
+    const [cart] = await cartResponse.json();
+    const cartItemResponse = await fetch(`http://localhost:5555/carts/${cart.cartId}/cart-items`);
+    const cartItems = await cartItemResponse.json();
+    const itemsToFetch = cartItems.map((cartItem) => fetch(`http://localhost:5555/items/${cartItem.itemId}`));
+    const itemResponses = await Promise.all(itemsToFetch);
+    const items = await Promise.all(itemResponses.map((itemResponse) => itemResponse.json()));
 
-const mapToDTO = (cartItem) => ({
-    'cart_id': cartItem.cartId,
-    'cart_item_id': cartItem.cartItemId,
-    'item_id': cartItem.itemId,
-    'quantity': cartItem.quantity
-});
-
-const getAllCartItems = () => {
-    const {rows} = selectCartItems();
-
-    return rows.map(mapToModel);
-};
-
-const getCartItemByCartItemId = (cartItemId) => {
-    const cartItem = selectCartItemByCartItemId(cartItemId);
-
-    if (!cartItem) {
-        return null;
-    }
-
-    return mapToModel(cartItem);
-};
-
-const getCartItemsByCartId = (cartId) => {
-    const {rows} = selectCartItemsByCartId(cartId);
-
-    return rows.map(mapToModel);
-};
-
-const addCartItem = (item) => insertCartItem(mapToDTO(item));
-const modifyCartItem = (item) => updateCartItem(mapToDTO(item));
-const removeCartItemByCartItemId = (itemId) => deleteCartItemByCartItemId(itemId);
-
-module.exports = {
-    addCartItem,
-    getAllCartItems,
-    getCartItemByCartItemId,
-    getCartItemsByCartId,
-    modifyCartItem,
-    removeCartItemByCartItemId
+    return {
+        customer,
+        cartItems,
+        items
+    };
 };
